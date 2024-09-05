@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" class="light">
 
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            // ... you can add more Tailwind configuration here if needed
+        }
+    </script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
@@ -111,66 +118,96 @@
                 transform: translateY(0);
             }
         }
+
+        .dark body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        .dark .tab-content {
+            background-color: #2d3748;
+        }
+        .dark .form-control,
+        .dark .form-select {
+            background-color: #4a5568;
+            color: #e2e8f0;
+            border-color: #4a5568;
+        }
+        .dark #text-result,
+        .dark #speech-result {
+            background-color: #2d3748;
+        }
     </style>
 </head>
 
-<body>
-    <div class="container mt-5">
-        <h1>AI智能复盘系统</h1>
-
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button"
-                    role="tab" aria-controls="text" aria-selected="true">文字交互复盘</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="mindmap-tab" data-bs-toggle="tab" data-bs-target="#mindmap" type="button"
-                    role="tab" aria-controls="mindmap" aria-selected="false">思维导图形式展示</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="speech-tab" data-bs-toggle="tab" data-bs-target="#speech" type="button"
-                    role="tab" aria-controls="speech" aria-selected="false">语音交互复盘</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="text" role="tabpanel" aria-labelledby="text-tab">
-                <select id="text-prompt-type" class="form-select">
-                    <option value="diary">日记复盘</option>
-                    <option value="study">学习复盘</option>
-                    <option value="meeting">会议复盘</option>
-                </select>
-                <textarea id="text-input" class="form-control" rows="4" placeholder="请输入您要复盘的内容..."></textarea>
-                <button onclick="analyzeText()" class="btn btn-primary w-100">分析</button>
-                <div id="text-result" class="mt-3"></div>
-            </div>
-            <div class="tab-pane fade" id="mindmap" role="tabpanel" aria-labelledby="mindmap-tab">
-                <select id="mindmap-prompt-type" class="form-select">
-                    <option value="diary">日记复盘</option>
-                    <option value="study">学习复盘</option>
-                    <option value="meeting">会议复盘</option>
-                </select>
-                <textarea id="mind-map-input" class="form-control" rows="4" placeholder="请输入您要生成思维导图的内容..."></textarea>
-                <button onclick="generateMindMap()" class="btn btn-primary w-100 mb-3">生成思维导图</button>
-                <div id="mind-map-result" class="d-flex flex-wrap justify-content-center"></div>
-            </div>
-            <div class="tab-pane fade" id="speech" role="tabpanel" aria-labelledby="speech-tab">
-                <select id="speech-prompt-type" class="form-select">
-                    <option value="diary">日记复盘</option>
-                    <option value="study">学习复盘</option>
-                    <option value="meeting">会议复盘</option>
-                </select>
-                <div class="mb-3">
-                    <button id="recordButton" onclick="toggleRecording()"
-                        class="btn btn-success mb-2 w-100">开始录音</button>
-                    <div class="input-group mb-2">
-                        <input type="file" id="audioFileInput" accept="audio/*" class="form-control"
-                            onchange="handleFileSelect()">
-                        <button class="btn btn-outline-secondary" type="button" onclick="clearFileInput()">清除</button>
-                    </div>
+<body class="transition-colors duration-300 bg-gray-100 dark:bg-gray-900">
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+                <div class="mb-4 sm:mb-0">
+                    <h1 class="text-3xl font-bold text-white">AI智能复盘系统</h1>
+                    <p class="text-blue-100 mt-2">智能分析，高效复盘</p>
                 </div>
-                <button onclick="processAudio()" class="btn btn-primary w-100 mb-3">处理音频</button>
-                <div id="speech-result" class="p-3 bg-white rounded shadow-sm"></div>
+                <button id="themeToggle" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex justify-center sm:justify-start">
+                <ul class="flex space-x-2 bg-white/20 p-1 rounded-lg" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab" aria-controls="text" aria-selected="true">文字交互复盘</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50" id="mindmap-tab" data-bs-toggle="tab" data-bs-target="#mindmap" type="button" role="tab" aria-controls="mindmap" aria-selected="false">思维导图形式展示</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50" id="speech-tab" data-bs-toggle="tab" data-bs-target="#speech" type="button" role="tab" aria-controls="speech" aria-selected="false">语音交互复盘</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="text" role="tabpanel" aria-labelledby="text-tab">
+                    <select id="text-prompt-type" class="form-select w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="diary">日记复盘</option>
+                        <option value="study">学习复盘</option>
+                        <option value="meeting">会议复盘</option>
+                    </select>
+                    <textarea id="text-input" class="form-control w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="4" placeholder="请输入您要复盘的内容..."></textarea>
+                    <button onclick="analyzeText()" class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200">分析</button>
+                    <div id="text-result" class="mt-3"></div>
+                </div>
+                <div class="tab-pane fade" id="mindmap" role="tabpanel" aria-labelledby="mindmap-tab">
+                    <select id="mindmap-prompt-type" class="form-select w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="diary">日记复盘</option>
+                        <option value="study">学习复盘</option>
+                        <option value="meeting">会议复盘</option>
+                    </select>
+                    <textarea id="mind-map-input" class="form-control w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="4" placeholder="请输入您要生成思维导图的内容..."></textarea>
+                    <button onclick="generateMindMap()" class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 mb-3">生成思维导图</button>
+                    <div id="mind-map-result" class="d-flex flex-wrap justify-content-center"></div>
+                </div>
+                <div class="tab-pane fade" id="speech" role="tabpanel" aria-labelledby="speech-tab">
+                    <select id="speech-prompt-type" class="form-select w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="diary">日记复盘</option>
+                        <option value="study">学习复盘</option>
+                        <option value="meeting">会议复盘</option>
+                    </select>
+                    <div class="mb-3">
+                        <button id="recordButton" onclick="toggleRecording()"
+                            class="btn btn-success mb-2 w-full">开始录音</button>
+                        <div class="input-group mb-2">
+                            <input type="file" id="audioFileInput" accept="audio/*" class="form-control"
+                                onchange="handleFileSelect()">
+                            <button class="btn btn-outline-secondary" type="button" onclick="clearFileInput()">清除</button>
+                        </div>
+                    </div>
+                    <button onclick="processAudio()" class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 mb-3">处理音频</button>
+                    <div id="speech-result" class="p-3 bg-white dark:bg-gray-700 rounded shadow-sm"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -310,6 +347,32 @@
             fileInput.value = '';
             recordButton.disabled = false;
         }
+
+        // Add this new function for theme toggling
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            
+            const isDark = html.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+        // Check for saved theme preference or prefer-color-scheme
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        document.querySelectorAll('.nav-link').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active', 'bg-white/20'));
+                this.classList.add('active', 'bg-white/20');
+            });
+        });
     </script>
 </body>
 
