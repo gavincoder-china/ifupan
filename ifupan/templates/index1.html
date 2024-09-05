@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,163 +8,70 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-            background-color: #f5f5f7;
-            color: #1d1d1f;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            font-weight: 600;
-            font-size: 32px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .nav-tabs {
-            border-bottom: none;
-            margin-bottom: 20px;
-        }
-
-        .nav-tabs .nav-link {
-            border: none;
-            background-color: #ffffff;
-            color: #1d1d1f;
-            border-radius: 20px;
-            padding: 10px 20px;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-tabs .nav-link:hover,
-        .nav-tabs .nav-link.active {
-            background-color: #0071e3;
-            color: #ffffff;
-        }
-
-        .tab-content {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 8px;
-            border: 1px solid #d2d2d7;
-            padding: 12px;
-            margin-bottom: 15px;
-        }
-
-        .btn-primary {
-            background-color: #0071e3;
-            border: none;
-            border-radius: 20px;
-            padding: 10px 20px;
-            font-weight: 500;
-        }
-
-        .btn-primary:hover {
-            background-color: #0077ed;
-        }
-
-        #text-result,
-        #speech-result {
-            background-color: #f5f5f7;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-
         @media (max-width: 768px) {
             .container {
                 padding-left: 15px;
                 padding-right: 15px;
             }
-
             .nav-tabs .nav-link {
-                padding: 8px 15px;
-                font-size: 14px;
+                padding: 0.5rem 0.5rem;
             }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+            #myTabContent {
+                margin-top: 1rem;
             }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .btn {
+                white-space: nowrap;
             }
         }
     </style>
 </head>
-
-<body>
+<body class="bg-light">
     <div class="container mt-5">
-        <h1>AI智能复盘系统</h1>
-
+        <h1 class="text-center mb-5">AI智能复盘系统</h1>
+        
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button"
-                    role="tab" aria-controls="text" aria-selected="true">文字交互复盘</button>
+                <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab" aria-controls="text" aria-selected="true">文字交互复盘</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="mindmap-tab" data-bs-toggle="tab" data-bs-target="#mindmap" type="button"
-                    role="tab" aria-controls="mindmap" aria-selected="false">思维导图形式展示</button>
+                <button class="nav-link" id="mindmap-tab" data-bs-toggle="tab" data-bs-target="#mindmap" type="button" role="tab" aria-controls="mindmap" aria-selected="false">思维导图形式展示</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="speech-tab" data-bs-toggle="tab" data-bs-target="#speech" type="button"
-                    role="tab" aria-controls="speech" aria-selected="false">语音交互复盘</button>
+                <button class="nav-link" id="speech-tab" data-bs-toggle="tab" data-bs-target="#speech" type="button" role="tab" aria-controls="speech" aria-selected="false">语音交互复盘</button>
             </li>
         </ul>
-
-        <div class="tab-content" id="myTabContent">
+        
+        <div class="tab-content mt-3" id="myTabContent">
             <div class="tab-pane fade show active" id="text" role="tabpanel" aria-labelledby="text-tab">
-                <select id="text-prompt-type" class="form-select">
+                <select id="text-prompt-type" class="form-select mb-2">
                     <option value="diary">日记复盘</option>
                     <option value="study">学习复盘</option>
                     <option value="meeting">会议复盘</option>
                 </select>
-                <textarea id="text-input" class="form-control" rows="4" placeholder="请输入您要复盘的内容..."></textarea>
-                <button onclick="analyzeText()" class="btn btn-primary w-100">分析</button>
-                <div id="text-result" class="mt-3"></div>
+                <textarea id="text-input" class="form-control mb-2" rows="4"></textarea>
+                <button onclick="analyzeText()" class="btn btn-primary">分析</button>
+                <div id="text-result" class="mt-3 p-3 bg-white rounded shadow-sm"></div>
             </div>
             <div class="tab-pane fade" id="mindmap" role="tabpanel" aria-labelledby="mindmap-tab">
-                <select id="mindmap-prompt-type" class="form-select">
+                <select id="mindmap-prompt-type" class="form-select mb-2">
                     <option value="diary">日记复盘</option>
                     <option value="study">学习复盘</option>
                     <option value="meeting">会议复盘</option>
                 </select>
-                <textarea id="mind-map-input" class="form-control" rows="4" placeholder="请输入您要生成思维导图的内容..."></textarea>
+                <textarea id="mind-map-input" class="form-control mb-2" rows="4"></textarea>
                 <button onclick="generateMindMap()" class="btn btn-primary w-100 mb-3">生成思维导图</button>
                 <div id="mind-map-result" class="d-flex flex-wrap justify-content-center"></div>
             </div>
             <div class="tab-pane fade" id="speech" role="tabpanel" aria-labelledby="speech-tab">
-                <select id="speech-prompt-type" class="form-select">
+                <select id="speech-prompt-type" class="form-select mb-2">
                     <option value="diary">日记复盘</option>
                     <option value="study">学习复盘</option>
                     <option value="meeting">会议复盘</option>
                 </select>
                 <div class="mb-3">
-                    <button id="recordButton" onclick="toggleRecording()"
-                        class="btn btn-success mb-2 w-100">开始录音</button>
+                    <button id="recordButton" onclick="toggleRecording()" class="btn btn-success mb-2 w-100">开始录音</button>
                     <div class="input-group mb-2">
-                        <input type="file" id="audioFileInput" accept="audio/*" class="form-control"
-                            onchange="handleFileSelect()">
+                        <input type="file" id="audioFileInput" accept="audio/*" class="form-control" onchange="handleFileSelect()">
                         <button class="btn btn-outline-secondary" type="button" onclick="clearFileInput()">清除</button>
                     </div>
                 </div>
@@ -174,7 +80,7 @@
             </div>
         </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function analyzeText() {
@@ -185,11 +91,10 @@
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    const resultDiv = document.getElementById('text-result');
-                    resultDiv.innerHTML = marked.parse(response.data.result);
-                    resultDiv.classList.add('fade-in');
-                });
+            .then(response => {
+                const resultDiv = document.getElementById('text-result');
+                resultDiv.innerHTML = marked.parse(response.data.result);
+            });
         }
 
         function generateMindMap() {
@@ -200,24 +105,24 @@
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    const mindMapLink = document.createElement('a');
-                    mindMapLink.href = `/download/${response.data.mind_map}`;
-                    mindMapLink.textContent = '下载思维导图';
-                    mindMapLink.download = response.data.mind_map;
-                    mindMapLink.className = 'btn btn-primary m-1';
+            .then(response => {
+                const mindMapLink = document.createElement('a');
+                mindMapLink.href = `/download/${response.data.mind_map}`;
+                mindMapLink.textContent = '下载思维导图';
+                mindMapLink.download = response.data.mind_map;
+                mindMapLink.className = 'btn btn-primary m-1';
 
-                    const pdfLink = document.createElement('a');
-                    pdfLink.href = `/download/${response.data.pdf}`;
-                    pdfLink.textContent = '下载PDF报告';
-                    pdfLink.download = response.data.pdf;
-                    pdfLink.className = 'btn btn-secondary m-1';
+                const pdfLink = document.createElement('a');
+                pdfLink.href = `/download/${response.data.pdf}`;
+                pdfLink.textContent = '下载PDF报告';
+                pdfLink.download = response.data.pdf;
+                pdfLink.className = 'btn btn-secondary m-1';
 
-                    const resultDiv = document.getElementById('mind-map-result');
-                    resultDiv.innerHTML = '';
-                    resultDiv.appendChild(mindMapLink);
-                    resultDiv.appendChild(pdfLink);
-                });
+                const resultDiv = document.getElementById('mind-map-result');
+                resultDiv.innerHTML = '';
+                resultDiv.appendChild(mindMapLink);
+                resultDiv.appendChild(pdfLink);
+            });
         }
 
         let isRecording = false;
@@ -227,7 +132,7 @@
         function toggleRecording() {
             const recordButton = document.getElementById('recordButton');
             const fileInput = document.getElementById('audioFileInput');
-
+            
             if (!isRecording) {
                 navigator.mediaDevices.getUserMedia({ audio: true })
                     .then(stream => {
@@ -275,7 +180,6 @@
                 .then(response => {
                     const resultDiv = document.getElementById('speech-result');
                     resultDiv.innerHTML = marked.parse(response.data.result);
-                    resultDiv.classList.add('fade-in');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -295,7 +199,7 @@
         function handleFileSelect() {
             const fileInput = document.getElementById('audioFileInput');
             const recordButton = document.getElementById('recordButton');
-
+            
             if (fileInput.files.length > 0) {
                 recordButton.disabled = true;
             } else {
@@ -306,11 +210,10 @@
         function clearFileInput() {
             const fileInput = document.getElementById('audioFileInput');
             const recordButton = document.getElementById('recordButton');
-
+            
             fileInput.value = '';
             recordButton.disabled = false;
         }
     </script>
 </body>
-
 </html>
