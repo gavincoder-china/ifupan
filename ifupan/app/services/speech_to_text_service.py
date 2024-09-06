@@ -24,7 +24,7 @@ class SpeechToTextService:
     @staticmethod
     async def transcribe_and_analyze(db: Session, audio_file, prompt_type: str):
         transcribed_text = SpeechToTextService.transcribe(audio_file)
-        result = TextAnalysisService.analyze(transcribed_text, prompt_type)
+        result = await TextAnalysisService.analyze(db, transcribed_text, prompt_type)
         return await SpeechToTextDAO.create(db, audio_file.filename, prompt_type, transcribed_text, result)
 
     @staticmethod
@@ -71,10 +71,22 @@ class SpeechToTextService:
 
     @staticmethod
     def transcribe(audio_file):
-        unique_filename = f"{uuid.uuid4()}.wav"
-        file_path = os.path.join('audio', unique_filename)
+        # Save the uploaded file temporarily
+        temp_filename = f"audio/{uuid.uuid4()}.wav"
+        audio_file.save(temp_filename)
 
-        audio_file.save(file_path)
+        # Detect language
+        language_code = SpeechToTextService.detect_language(temp_filename)
 
-        result = SpeechToTextService.asr(file_path)
-        return result
+        # Transcribe the file
+        transcript = SpeechToTextService.transcribe_file(temp_filename, language_code)
+
+        # Remove the temporary file
+        os.remove(temp_filename)
+
+        # Convert simplified Chinese to traditional Chinese if needed
+        if language_code == "zh":
+            cc = OpenCC('s2t')
+            return cc.convert(transcript.text)
+        else:
+            return transcript.text

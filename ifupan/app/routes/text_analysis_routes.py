@@ -6,7 +6,8 @@ text_analysis_bp = Blueprint('text_analysis', __name__)
 
 @text_analysis_bp.route('/analyze', methods=['POST'])
 async def analyze():
-    async for db in get_db():
+    db = await anext(get_db())
+    try:
         data = request.json
         text = data.get('text', '')
         prompt_type = data.get('promptType', 'diary')
@@ -14,6 +15,8 @@ async def analyze():
         result = await TextAnalysisService.analyze_and_save(db, text, prompt_type)
         
         return jsonify({'result': result.result})
+    finally:
+        await db.close()
 
 @text_analysis_bp.route('/<int:analysis_id>', methods=['GET'])
 async def get_analysis_by_id(analysis_id):
