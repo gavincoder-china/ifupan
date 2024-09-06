@@ -9,6 +9,8 @@ import os
 import graphviz
 import markdown
 from weasyprint import HTML, CSS
+import time
+from flask import send_from_directory
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -18,8 +20,8 @@ if not os.path.exists('files'):
 class MindMapService:
     @staticmethod
     async def generate_and_save(db: Session, input_text: str, prompt_type: str):
-        mind_map_file, pdf_file = MindMapService.generate(input_text, prompt_type)
-        return await MindMapDAO.create(db, input_text, prompt_type, mind_map_file, pdf_file)
+        mind_map_file, pdf_file, md_file = await MindMapService.generate(db, input_text, prompt_type)
+        return await MindMapDAO.create(db, input_text, prompt_type, mind_map_file, pdf_file, md_file)
 
     @staticmethod
     async def get_mind_map_by_id(db: Session, mind_map_id: int):
@@ -28,25 +30,32 @@ class MindMapService:
     @staticmethod
     async def get_all_mind_maps(db: Session, skip: int = 0, limit: int = 100):
         return await MindMapDAO.get_all(db, skip, limit)
-
+    
     @staticmethod
-    def generate(text, prompt_type):
+    async def generate(db, text, prompt_type):
         mind_map_file = None
         pdf_file = None
-
+        md_file = None
+        review_content = await TextAnalysisService.analyze(db, text, prompt_type)
         try:
-            mind_map_file = MindMapService.generate_mind_map(text)
+            mind_map_file = MindMapService.generate_mind_map(review_content)
+            mind_map_file = os.path.basename(mind_map_file)
             logging.info(f"思维导图已生成：{mind_map_file}")
         except Exception as e:
             logging.error(f"生成思维导图时发生错误: {str(e)}")
+            mind_map_file = "error_mind_map.png"  # Set a default value
 
         try:
-            pdf_file = MindMapService.generate_pdf_report(text, prompt_type)
-            logging.info(f"复盘报告已生成：{pdf_file}")
+            pdf_file, md_file = await MindMapService.generate_pdf_report(review_content)
+            pdf_file = os.path.basename(pdf_file)
+            md_file = os.path.basename(md_file)
+            logging.info(f"复盘报告已生成：{pdf_file}, Markdown文件：{md_file}")
         except Exception as e:
             logging.error(f"生成PDF报告时发生错误: {str(e)}")
+            pdf_file = "error_report.pdf"  # Set a default value
+            md_file = "error_report.md"  # Set a default value
 
-        return mind_map_file, pdf_file
+        return mind_map_file, pdf_file, md_file
 
     @staticmethod
     def generate_mind_map(text):
@@ -99,15 +108,16 @@ class MindMapService:
 
         add_nodes(None, structure)
 
-        mind_map_filename = os.path.join('files', 'mind_map.gv')
+        unique_filename = f'mind_map_{int(time.time())}.gv'
+        mind_map_filename = os.path.join('files', unique_filename)
         dot.render(mind_map_filename, format='png', cleanup=True)
         return mind_map_filename + '.png'
 
     @staticmethod
-    def generate_pdf_report(text, prompt_type):
-        review_content = TextAnalysisService.analyze(text, prompt_type)
+    async def generate_pdf_report(review_content):
 
-        md_filename = os.path.join('files', 'review_report.md')
+        unique_filename = f'review_report_{int(time.time())}'
+        md_filename = os.path.join('files', f'{unique_filename}.md')
         with open(md_filename, 'w', encoding='utf-8') as f:
             f.write("# 复盘报告\n\n")
             f.write(review_content)
@@ -123,7 +133,7 @@ class MindMapService:
             h2 { color: #666699; }
         ''')
 
-        pdf_filename = os.path.join('files', 'review_report.pdf')
+        pdf_filename = os.path.join('files', f'{unique_filename}.pdf')
         HTML(string=html_content).write_pdf(pdf_filename, stylesheets=[css])
 
-        return pdf_filename
+        return pdf_filename, md_filename

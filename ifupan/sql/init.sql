@@ -14,8 +14,9 @@ CREATE TABLE IF NOT EXISTS mind_map (
     id INT AUTO_INCREMENT PRIMARY KEY,
     input_text TEXT NOT NULL,
     prompt_type VARCHAR(50) NOT NULL,
-    mind_map_file VARCHAR(255) NOT NULL,
-    pdf_file VARCHAR(255) NOT NULL,
+    mind_map_file VARCHAR(255),
+    pdf_file VARCHAR(255),
+    md_file VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -44,16 +45,16 @@ INSERT INTO text_analysis (input_text, prompt_type, result) VALUES
 ('团队会议讨论了新产品launch计划', 'meeting', '{"analysis": "新产品launch是一个重要的里程碑。确保团队成员都清楚自己的职责，并建立定期的进度检查机制。考虑可能的风险并制定应对策略。"}');
 
 -- Insert sample data into mind_map table
-INSERT INTO mind_map (input_text, prompt_type, mind_map_file, pdf_file) VALUES
-('项目管理流程', 'study', '/files/mindmaps/project_management.png', '/files/pdfs/project_management.pdf'),
-('周末旅行计划', 'diary', '/files/mindmaps/weekend_trip.png', '/files/pdfs/weekend_trip.pdf'),
-('产品发布会议纪要', 'meeting', '/files/mindmaps/product_launch.png', '/files/pdfs/product_launch.pdf');
+INSERT INTO mind_map (input_text, prompt_type, mind_map_file, pdf_file, md_file) VALUES
+('项目管理流程', 'study', '/files/mindmaps/project_management.png', '/files/pdfs/project_management.pdf', '/files/markdown/project_management.md'),
+('周末旅行计划', 'diary', '/files/mindmaps/weekend_trip.png', '/files/pdfs/weekend_trip.pdf', '/files/markdown/weekend_trip.md'),
+('产品发布会议纪要', 'meeting', '/files/mindmaps/product_launch.png', '/files/pdfs/product_launch.pdf', '/files/markdown/product_launch.md');
 
 -- Insert sample data into speech_to_text table
 INSERT INTO speech_to_text (audio_file, prompt_type, transcribed_text, result) VALUES
 ('/audio/meeting_01.mp3', 'meeting', '我们需要在下周五之前完成这个项目的初步设计', '{"analysis": "项目有明确的截止日期，建议立即开始任务分配和进度跟踪。考虑使用项目管理工具来协调团队工作。"}'),
 ('/audio/diary_01.mp3', 'diary', '今天是我入职新公司的第一天，感觉很兴奋但也有些紧张', '{"analysis": "新的开始总是充满机遇和挑战。建议您积极融入新环境，主动了解公司文化和工作流程。记录下您的观察和感受，这将帮助您更好地适应和成长。"}'),
-('/audio/study_01.mp3', 'study', '我正在学习机器学习的基础知识，感觉概念有些抽象', '{"analysis": "机器学习确实有一些抽象的概念。建议您结合实际案例来理解这些概念，可以尝试一些小型项目来实践所学知识。同时，寻找学习伙伴或加入相关社区可以帮助您更好地理解和应用这些知识。"}');
+('/audio/study_01.mp3', 'study', '我正在学习机器学习的基础知识，感觉概念有些抽象', '{"analysis": "机器学习确实有一些抽象的概念。建议您结合实际案例来理解这些概念，可以尝试一些小型项目来实践所学知识。同时，寻找学习伙伴或加入相关社区以帮助您更好地理解和应用这些知识。"}');
 
 -- Insert initial prompts
 INSERT INTO prompts (code, name, content) VALUES

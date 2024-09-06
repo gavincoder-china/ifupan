@@ -2,17 +2,17 @@ from config.database import async_engine, AsyncSessionLocal, Base
 from utils.log_util import logger
 
 
-async def get_db():
+def get_db():
     """
     每一个请求处理完毕后会关闭当前连接，不同的请求使用不同的连接
 
     :return:
     """
-    async with AsyncSessionLocal() as current_db:
-        try:
-            yield current_db
-        finally:
-            await current_db.close()
+    db = AsyncSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 async def init_create_table():

@@ -123,15 +123,18 @@
             background-color: #1a202c;
             color: #e2e8f0;
         }
+
         .dark .tab-content {
             background-color: #2d3748;
         }
+
         .dark .form-control,
         .dark .form-select {
             background-color: #4a5568;
             color: #e2e8f0;
             border-color: #4a5568;
         }
+
         .dark #text-result,
         .dark #speech-result {
             background-color: #2d3748;
@@ -140,127 +143,161 @@
 </head>
 
 <body class="transition-colors duration-300 bg-gray-100 dark:bg-gray-900">
-    <div class="container mx-auto px-4 py-8">
-        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg p-6 mb-8">
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
-                <div class="mb-4 sm:mb-0">
-                    <h1 class="text-3xl font-bold text-white">AI智能复盘系统</h1>
-                    <p class="text-blue-100 mt-2">智能分析，高效复盘</p>
-                </div>
-                <button id="themeToggle" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
-                </button>
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg p-6 mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+            <div class="mb-4 sm:mb-0">
+                <h1 class="text-3xl font-bold text-white">AI智能复盘系统</h1>
+                <p class="text-blue-100 mt-2">智能分析，高效复盘</p>
             </div>
-            <div class="flex justify-center sm:justify-start">
-                <ul class="flex space-x-2 bg-white/20 p-1 rounded-lg" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab" aria-controls="text" aria-selected="true">文字交互复盘</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50" id="mindmap-tab" data-bs-toggle="tab" data-bs-target="#mindmap" type="button" role="tab" aria-controls="mindmap" aria-selected="false">思维导图形式展示</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50" id="speech-tab" data-bs-toggle="tab" data-bs-target="#speech" type="button" role="tab" aria-controls="speech" aria-selected="false">语音交互复盘</button>
-                    </li>
-                </ul>
-            </div>
+            <button id="themeToggle"
+                    class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+            </button>
         </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="text" role="tabpanel" aria-labelledby="text-tab">
-                    <select id="text-prompt-type" class="form-select mb-2">
-                        <!-- Options will be dynamically populated -->
-                    </select>
-                    <textarea id="text-input" class="form-control w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="4" placeholder="请输入您要复盘的内容..."></textarea>
-                    <button onclick="analyzeText()" class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200">分析</button>
-                    <div id="text-result" class="mt-3"></div>
-                </div>
-                <div class="tab-pane fade" id="mindmap" role="tabpanel" aria-labelledby="mindmap-tab">
-                    <select id="mindmap-prompt-type" class="form-select mb-2">
-                        <!-- Options will be dynamically populated -->
-                    </select>
-                    <textarea id="mind-map-input" class="form-control w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="4" placeholder="请输入您要生成思维导图的内容..."></textarea>
-                    <button onclick="generateMindMap()" class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 mb-3">生成思维导图</button>
-                    <div id="mind-map-result" class="d-flex flex-wrap justify-content-center"></div>
-                </div>
-                <div class="tab-pane fade" id="speech" role="tabpanel" aria-labelledby="speech-tab">
-                    <select id="speech-prompt-type" class="form-select w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                        <!-- Options will be dynamically populated -->
-                    </select>
-                    <div class="mb-3">
-                        <button id="recordButton" onclick="toggleRecording()"
-                            class="btn btn-success mb-2 w-full">开始录音</button>
-                        <div class="input-group mb-2">
-                            <input type="file" id="audioFileInput" accept="audio/*" class="form-control"
-                                onchange="handleFileSelect()">
-                            <button class="btn btn-outline-secondary" type="button" onclick="clearFileInput()">清除</button>
-                        </div>
-                    </div>
-                    <button onclick="processAudio()" class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 mb-3">处理音频</button>
-                    <div id="speech-result" class="p-3 bg-white dark:bg-gray-700 rounded shadow-sm"></div>
-                </div>
-            </div>
+        <div class="flex justify-center sm:justify-start">
+            <ul class="flex space-x-2 bg-white/20 p-1 rounded-lg" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 active"
+                            id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab"
+                            aria-controls="text" aria-selected="true">文字交互复盘
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                            id="mindmap-tab" data-bs-toggle="tab" data-bs-target="#mindmap" type="button" role="tab"
+                            aria-controls="mindmap" aria-selected="false">思维导图形式展示
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                            id="speech-tab" data-bs-toggle="tab" data-bs-target="#speech" type="button" role="tab"
+                            aria-controls="speech" aria-selected="false">语音交互复盘
+                    </button>
+                </li>
+            </ul>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function analyzeText() {
-            const text = document.getElementById('text-input').value;
-            const promptType = document.getElementById('text-prompt-type').value;
-            axios.post('/api/text-analysis/analyze', { text: text, promptType: promptType }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="text" role="tabpanel" aria-labelledby="text-tab">
+                <select id="text-prompt-type" class="form-select mb-2">
+                    <!-- Options will be dynamically populated -->
+                </select>
+                <textarea id="text-input"
+                          class="form-control w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                          rows="4" placeholder="请输入您要复盘的内容..."></textarea>
+                <button onclick="analyzeText()"
+                        class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200">
+                    分析
+                </button>
+                <div id="text-result" class="mt-3"></div>
+            </div>
+            <div class="tab-pane fade" id="mindmap" role="tabpanel" aria-labelledby="mindmap-tab">
+                <select id="mindmap-prompt-type" class="form-select mb-2">
+                    <!-- Options will be dynamically populated -->
+                </select>
+                <textarea id="mind-map-input"
+                          class="form-control w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                          rows="4" placeholder="请输入您要生成思维导图的内容..."></textarea>
+                <button onclick="generateMindMap()"
+                        class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 mb-3">
+                    生成思维导图
+                </button>
+                <div id="mind-map-result" class="d-flex flex-wrap justify-content-center"></div>
+            </div>
+            <div class="tab-pane fade" id="speech" role="tabpanel" aria-labelledby="speech-tab">
+                <select id="speech-prompt-type"
+                        class="form-select w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <!-- Options will be dynamically populated -->
+                </select>
+                <div class="mb-3">
+                    <button id="recordButton" onclick="toggleRecording()"
+                            class="btn btn-success mb-2 w-full">开始录音
+                    </button>
+                    <div class="input-group mb-2">
+                        <input type="file" id="audioFileInput" accept="audio/*" class="form-control"
+                               onchange="handleFileSelect()">
+                        <button class="btn btn-outline-secondary" type="button" onclick="clearFileInput()">清除</button>
+                    </div>
+                </div>
+                <button onclick="processAudio()"
+                        class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 mb-3">
+                    处理音频
+                </button>
+                <div id="speech-result" class="p-3 bg-white dark:bg-gray-700 rounded shadow-sm"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function analyzeText() {
+        const text = document.getElementById('text-input').value;
+        const promptType = document.getElementById('text-prompt-type').value;
+        axios.post('/api/text-analysis/analyze', {text: text, promptType: promptType}, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
                 .then(response => {
                     const resultDiv = document.getElementById('text-result');
                     resultDiv.innerHTML = marked.parse(response.data.result);
                     resultDiv.classList.add('fade-in');
                 });
-        }
+    }
 
-        function generateMindMap() {
-            const text = document.getElementById('mind-map-input').value;
-            const promptType = document.getElementById('mindmap-prompt-type').value;
-            axios.post('/api/mind-map/generate', { text: text, promptType: promptType }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    const mindMapLink = document.createElement('a');
-                    mindMapLink.href = `/api/mind-map/${response.data.mind_map}`;
-                    mindMapLink.textContent = '下载思维导图';
-                    mindMapLink.download = response.data.mind_map;
-                    mindMapLink.className = 'btn btn-primary m-1';
+    function generateMindMap() {
+        const text = document.getElementById('mind-map-input').value;
+        const promptType = document.getElementById('mindmap-prompt-type').value;
+        axios.post('/api/mind-map/generate', {text: text, promptType: promptType}, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            const mindMapLink = document.createElement('a');
+            mindMapLink.href = `/api/mind-map/${response.data.mind_map}`;
+            mindMapLink.textContent = '下载思维导图';
+            mindMapLink.download = response.data.mind_map;
+            mindMapLink.className = 'btn btn-primary m-1';
 
-                    const pdfLink = document.createElement('a');
-                    pdfLink.href = `/api/mind-map/${response.data.mind_map}/pdf`;
-                    pdfLink.textContent = '下载PDF报告';
-                    pdfLink.download = response.data.pdf;
-                    pdfLink.className = 'btn btn-secondary m-1';
+            const pdfLink = document.createElement('a');
+            pdfLink.href = `/api/mind-map/${response.data.pdf}`;
+            pdfLink.textContent = '下载PDF报告';
+            pdfLink.download = response.data.pdf;
+            pdfLink.className = 'btn btn-secondary m-1';
 
-                    const resultDiv = document.getElementById('mind-map-result');
-                    resultDiv.innerHTML = '';
-                    resultDiv.appendChild(mindMapLink);
-                    resultDiv.appendChild(pdfLink);
-                });
-        }
+            const mdLink = document.createElement('a');
+            mdLink.href = `/api/mind-map/${response.data.markdown}`;
+            mdLink.textContent = '下载Markdown文件';
+            mdLink.download = response.data.markdown;
+            mdLink.className = 'btn btn-info m-1';
 
-        let isRecording = false;
-        let mediaRecorder;
-        let audioChunks = [];
+            const resultDiv = document.getElementById('mind-map-result');
+            resultDiv.innerHTML = '';
+            resultDiv.appendChild(mindMapLink);
+            resultDiv.appendChild(pdfLink);
+            resultDiv.appendChild(mdLink);
+        });
+    }
 
-        function toggleRecording() {
-            const recordButton = document.getElementById('recordButton');
-            const fileInput = document.getElementById('audioFileInput');
+    let isRecording = false;
+    let mediaRecorder;
+    let audioChunks = [];
 
-            if (!isRecording) {
-                navigator.mediaDevices.getUserMedia({ audio: true })
+    function toggleRecording() {
+        const recordButton = document.getElementById('recordButton');
+        const fileInput = document.getElementById('audioFileInput');
+
+        if (!isRecording) {
+            navigator.mediaDevices.getUserMedia({audio: true})
                     .then(stream => {
                         mediaRecorder = new MediaRecorder(stream);
                         mediaRecorder.start();
@@ -275,34 +312,34 @@
                         isRecording = true;
                         fileInput.disabled = true;
                     });
-            } else {
-                mediaRecorder.stop();
-                recordButton.textContent = '开始录音';
-                recordButton.classList.remove('btn-danger');
-                recordButton.classList.add('btn-success');
-                isRecording = false;
-                fileInput.disabled = false;
-            }
+        } else {
+            mediaRecorder.stop();
+            recordButton.textContent = '开始录音';
+            recordButton.classList.remove('btn-danger');
+            recordButton.classList.add('btn-success');
+            isRecording = false;
+            fileInput.disabled = false;
+        }
+    }
+
+    function processAudio() {
+        const audioFile = document.getElementById('audioFileInput').files[0];
+        const promptType = document.getElementById('speech-prompt-type').value;
+        const formData = new FormData();
+
+        if (audioFile) {
+            formData.append("audio", audioFile);
+        } else if (audioChunks.length > 0) {
+            const audioBlob = new Blob(audioChunks, {type: 'audio/wav'});
+            formData.append("audio", audioBlob, "recording.wav");
+        } else {
+            alert("请先录音或上传音频文件");
+            return;
         }
 
-        function processAudio() {
-            const audioFile = document.getElementById('audioFileInput').files[0];
-            const promptType = document.getElementById('speech-prompt-type').value;
-            const formData = new FormData();
+        formData.append("promptType", promptType);
 
-            if (audioFile) {
-                formData.append("audio", audioFile);
-            } else if (audioChunks.length > 0) {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                formData.append("audio", audioBlob, "recording.wav");
-            } else {
-                alert("请先录音或上传音频文件");
-                return;
-            }
-
-            formData.append("promptType", promptType);
-
-            axios.post('/api/speech-to-text/transcribe', formData)
+        axios.post('/api/speech-to-text/transcribe', formData)
                 .then(response => {
                     const resultDiv = document.getElementById('speech-result');
                     resultDiv.innerHTML = marked.parse(response.data.result);
@@ -313,63 +350,63 @@
                     alert('处理音频时出错');
                 });
 
-            // Reset recording state
-            audioChunks = [];
-            const recordButton = document.getElementById('recordButton');
-            recordButton.textContent = '开始录音';
-            recordButton.classList.remove('btn-danger');
-            recordButton.classList.add('btn-success');
-            isRecording = false;
-            document.getElementById('audioFileInput').disabled = false;
-        }
+        // Reset recording state
+        audioChunks = [];
+        const recordButton = document.getElementById('recordButton');
+        recordButton.textContent = '开始录音';
+        recordButton.classList.remove('btn-danger');
+        recordButton.classList.add('btn-success');
+        isRecording = false;
+        document.getElementById('audioFileInput').disabled = false;
+    }
 
-        function handleFileSelect() {
-            const fileInput = document.getElementById('audioFileInput');
-            const recordButton = document.getElementById('recordButton');
+    function handleFileSelect() {
+        const fileInput = document.getElementById('audioFileInput');
+        const recordButton = document.getElementById('recordButton');
 
-            if (fileInput.files.length > 0) {
-                recordButton.disabled = true;
-            } else {
-                recordButton.disabled = false;
-            }
-        }
-
-        function clearFileInput() {
-            const fileInput = document.getElementById('audioFileInput');
-            const recordButton = document.getElementById('recordButton');
-
-            fileInput.value = '';
+        if (fileInput.files.length > 0) {
+            recordButton.disabled = true;
+        } else {
             recordButton.disabled = false;
         }
+    }
 
-        // Add this new function for theme toggling
-        function toggleTheme() {
-            const html = document.documentElement;
-            html.classList.toggle('dark');
-            
-            const isDark = html.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
+    function clearFileInput() {
+        const fileInput = document.getElementById('audioFileInput');
+        const recordButton = document.getElementById('recordButton');
 
-        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        fileInput.value = '';
+        recordButton.disabled = false;
+    }
 
-        // Check for saved theme preference or prefer-color-scheme
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Add this new function for theme toggling
+    function toggleTheme() {
+        const html = document.documentElement;
+        html.classList.toggle('dark');
 
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            document.documentElement.classList.add('dark');
-        }
+        const isDark = html.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
 
-        document.querySelectorAll('.nav-link').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active', 'bg-white/20'));
-                this.classList.add('active', 'bg-white/20');
-            });
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+    // Check for saved theme preference or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+    }
+
+    document.querySelectorAll('.nav-link').forEach(tab => {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active', 'bg-white/20'));
+            this.classList.add('active', 'bg-white/20');
         });
+    });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('/api/common/prompts')
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/api/common/prompts')
                 .then(response => response.json())
                 .then(data => {
                     const selectElements = ['text-prompt-type', 'mindmap-prompt-type', 'speech-prompt-type'];
@@ -384,8 +421,8 @@
                     });
                 })
                 .catch(error => console.error('Error fetching prompts:', error));
-        });
-    </script>
+    });
+</script>
 </body>
 
 </html>
