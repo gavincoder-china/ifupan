@@ -1,11 +1,11 @@
+import asyncio
+
 from flask import Flask, render_template
-from config.database import async_engine as engine, Base
-from app.routes.text_analysis_routes import text_analysis_bp
+
+from app.routes.common_routes import common_bp
 from app.routes.mind_map_routes import mind_map_bp
 from app.routes.speech_to_text_routes import speech_to_text_bp
-from app.routes.common_routes import common_bp
-from config.get_db import init_create_table
-import asyncio
+from app.routes.text_analysis_routes import text_analysis_bp
 
 app = Flask(__name__, template_folder='app/views/templates')
 
