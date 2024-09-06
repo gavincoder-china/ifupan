@@ -14,7 +14,7 @@ async def get_prompts():
         await RedisUtil.close_redis_pool(redis)
         return jsonify(eval(cached_prompts))
     
-    async for db in get_db():
+    async with get_db() as db:
         prompts = await PromptService.get_all_prompts(db)
     
         prompts_list = [{'code': p.code, 'name': p.name} for p in prompts]

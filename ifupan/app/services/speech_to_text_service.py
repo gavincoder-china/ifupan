@@ -26,7 +26,12 @@ class SpeechToTextService:
     async def transcribe_and_analyze(db: AsyncSession, audio_file, prompt_type: str):
         transcribed_text = await SpeechToTextService.transcribe(audio_file)
         result = await TextAnalysisService.analyze(db, transcribed_text, prompt_type)
-        return await SpeechToTextDAO.create(db, audio_file.filename, prompt_type, transcribed_text, result)
+        created_record = await SpeechToTextDAO.create(db, audio_file.filename, prompt_type, transcribed_text, result)
+        return {
+            'id': created_record.id,
+            'transcribed_text': created_record.transcribed_text,
+            'result': created_record.result
+        }
 
     @staticmethod
     async def get_transcription_by_id(db: AsyncSession, transcription_id: int):
@@ -57,38 +62,21 @@ class SpeechToTextService:
             ),
         )
         transcript = await asyncio.to_thread(transcriber.transcribe, audio_url, config=config)
-        return transcript
-
-    @staticmethod
-    async def asr(audio_url):
-        language_code = await SpeechToTextService.detect_language(audio_url)
-        transcript = await SpeechToTextService.transcribe_file(audio_url, language_code)
-
-        if language_code in ['zh', 'zh-TW', 'zh-HK']:
-            cc = OpenCC('t2s')
-            return cc.convert(transcript.text)
-        else:
-            return transcript.text
+        return transcript.text
 
     @staticmethod
     async def transcribe(audio_file):
-        # Save the uploaded file temporarily
-        temp_filename = f"audio/{uuid.uuid4()}.wav"
-        audio_file.save(temp_filename)
+        filename = f"{uuid.uuid4()}.wav"
+        file_path = os.path.join('audio', filename)
+        audio_file.save(file_path)
 
-        try:
-            # Detect language
-            language_code = await SpeechToTextService.detect_language(temp_filename)
+        language_code = await SpeechToTextService.detect_language(file_path)
+        transcribed_text = await SpeechToTextService.transcribe_file(file_path, language_code)
 
-            # Transcribe the file
-            transcript = await SpeechToTextService.transcribe_file(temp_filename, language_code)
+        os.remove(file_path)
 
-            # Convert simplified Chinese to traditional Chinese if needed
-            if language_code == "zh":
-                cc = OpenCC('s2t')
-                return cc.convert(transcript.text)
-            else:
-                return transcript.text
-        finally:
-            # Remove the temporary file
-            os.remove(temp_filename)
+        if language_code.startswith('zh'):
+            cc = OpenCC('s2t')
+            transcribed_text = cc.convert(transcribed_text)
+
+        return transcribed_text

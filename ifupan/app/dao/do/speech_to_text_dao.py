@@ -8,7 +8,6 @@ class SpeechToTextDAO:
         db_item = SpeechToText(audio_file=audio_file, prompt_type=prompt_type, transcribed_text=transcribed_text, result=result)
         db.add(db_item)
         await db.commit()
-        await db.refresh(db_item)
         return db_item
 
     @staticmethod

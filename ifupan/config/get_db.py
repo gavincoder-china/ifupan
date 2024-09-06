@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from config.database import AsyncSessionLocal, Base, async_engine
 from utils.log_util import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
 @asynccontextmanager
 async def get_db():
@@ -9,11 +10,8 @@ async def get_db():
 
     :return:
     """
-    async with AsyncSessionLocal() as current_db:
-        try:
-            yield current_db
-        finally:
-            await current_db.close()
+    async with AsyncSessionLocal() as session:
+        yield session
 
 
 async def init_create_table():
