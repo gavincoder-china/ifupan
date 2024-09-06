@@ -35,8 +35,8 @@ supported_languages_for_best = {
 }
 
 # Create an 'audio' directory if it doesn't exist
-if not os.path.exists('audio'):
-    os.makedirs('audio')
+if not os.path.exists('../../audio'):
+    os.makedirs('../../audio')
 
 def detect_language(audio_url):
     config = aai.TranscriptionConfig(
@@ -77,7 +77,7 @@ def asr(audio_url):
 def transcribe(audio_file):
     # Generate a unique filename
     unique_filename = f"{uuid.uuid4()}.wav"
-    file_path = os.path.join('audio', unique_filename)
+    file_path = os.path.join('../../audio', unique_filename)
 
     # Save the audio file
     audio_file.save(file_path)

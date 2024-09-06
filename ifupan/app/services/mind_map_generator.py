@@ -6,15 +6,15 @@ import os
 import graphviz
 import markdown
 from weasyprint import HTML, CSS
-from deepseek_v2_langchain import deepseek_analyze
-from text_analysis import analyze
+from ifupan.utils.deepseek_v2_langchain import deepseek_analyze
+from ifupan.app.services.text_analysis import analyze
 
 # 设置日志
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Create a 'files' directory if it doesn't exist
-if not os.path.exists('files'):
-    os.makedirs('files')
+if not os.path.exists('../../files'):
+    os.makedirs('../../files')
 
 
 def generate(text, prompt_type):
@@ -96,7 +96,7 @@ def generate_mind_map(text):
     add_nodes(None, structure)
 
     # 保存思维导图
-    mind_map_filename = os.path.join('files', 'mind_map.gv')
+    mind_map_filename = os.path.join('../../files', 'mind_map.gv')
     dot.render(mind_map_filename, format='png', cleanup=True)
     return mind_map_filename + '.png'
 
@@ -105,7 +105,7 @@ def generate_pdf_report(text, prompt_type):
     review_content = analyze(text, prompt_type)
 
     # 将内容保存为Markdown文件
-    md_filename = os.path.join('files', 'review_report.md')
+    md_filename = os.path.join('../../files', 'review_report.md')
     with open(md_filename, 'w', encoding='utf-8') as f:
         f.write("# 复盘报告\n\n")
         f.write(review_content)
@@ -124,7 +124,7 @@ def generate_pdf_report(text, prompt_type):
     ''')
 
     # 创建PDF
-    pdf_filename = os.path.join('files', 'review_report.pdf')
+    pdf_filename = os.path.join('../../files', 'review_report.pdf')
     HTML(string=html_content).write_pdf(pdf_filename, stylesheets=[css])
 
     return pdf_filename

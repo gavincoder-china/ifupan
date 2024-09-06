@@ -217,7 +217,7 @@
         function analyzeText() {
             const text = document.getElementById('text-input').value;
             const promptType = document.getElementById('text-prompt-type').value;
-            axios.post('/analyze', { text: text, promptType: promptType }, {
+            axios.post('/api/text-analysis/analyze', { text: text, promptType: promptType }, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -232,20 +232,20 @@
         function generateMindMap() {
             const text = document.getElementById('mind-map-input').value;
             const promptType = document.getElementById('mindmap-prompt-type').value;
-            axios.post('/generate_mind_map', { text: text, promptType: promptType }, {
+            axios.post('/api/mind-map/generate', { text: text, promptType: promptType }, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
                 .then(response => {
                     const mindMapLink = document.createElement('a');
-                    mindMapLink.href = `/download/${response.data.mind_map}`;
+                    mindMapLink.href = `/api/mind-map/${response.data.mind_map}`;
                     mindMapLink.textContent = '下载思维导图';
                     mindMapLink.download = response.data.mind_map;
                     mindMapLink.className = 'btn btn-primary m-1';
 
                     const pdfLink = document.createElement('a');
-                    pdfLink.href = `/download/${response.data.pdf}`;
+                    pdfLink.href = `/api/mind-map/${response.data.mind_map}/pdf`;
                     pdfLink.textContent = '下载PDF报告';
                     pdfLink.download = response.data.pdf;
                     pdfLink.className = 'btn btn-secondary m-1';
@@ -308,7 +308,7 @@
 
             formData.append("promptType", promptType);
 
-            axios.post('/speech_to_text', formData)
+            axios.post('/api/speech-to-text/transcribe', formData)
                 .then(response => {
                     const resultDiv = document.getElementById('speech-result');
                     resultDiv.innerHTML = marked.parse(response.data.result);

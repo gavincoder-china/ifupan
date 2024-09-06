@@ -1,49 +1,27 @@
-from flask import Flask, render_template, request, jsonify, send_file
-import os
-import text_analysis
-import mind_map_generator
-import speech_to_text
+from flask import Flask, render_template
+from config.database import async_engine as engine, Base
+from app.routes.text_analysis_routes import text_analysis_bp
+from app.routes.mind_map_routes import mind_map_bp
+from app.routes.speech_to_text_routes import speech_to_text_bp
+from app.routes.common_routes import common_bp
+from config.get_db import init_create_table
+import asyncio
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='app/views/templates')
+
+# Register blueprints
+app.register_blueprint(text_analysis_bp, url_prefix='/api/text-analysis')
+app.register_blueprint(mind_map_bp, url_prefix='/api/mind-map')
+app.register_blueprint(speech_to_text_bp, url_prefix='/api/speech-to-text')
+app.register_blueprint(common_bp, url_prefix='/api/common')
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/analyze', methods=['POST'])
-def analyze():
-    data = request.json
-    text = data.get('text', '')
-    prompt_type = data.get('promptType', 'diary')  # Default to diary if not specified
-    result = text_analysis.analyze(text, prompt_type)
-    return jsonify({'result': result})
-
-@app.route('/generate_mind_map', methods=['POST'])
-def generate_mind_map():
-    data = request.json
-    text = data.get('text', '')
-    prompt_type = data.get('promptType', 'diary')
-    mind_map, pdf = mind_map_generator.generate(text, prompt_type)
-    return jsonify({
-        'mind_map': os.path.basename(mind_map),
-        'pdf': os.path.basename(pdf)
-    })
-
-@app.route('/speech_to_text', methods=['POST'])
-def speech_to_text_route():
-    if 'audio' not in request.files:
-        return jsonify({'error': 'No audio file provided'}), 400
-    audio_file = request.files['audio']
-    if audio_file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    prompt_type = request.form.get('promptType', 'diary')
-    text = speech_to_text.transcribe(audio_file)
-    result = text_analysis.analyze(text, prompt_type)
-    return jsonify({'result': result})
-
-@app.route('/download/<filename>')
-def download_file(filename):
-    return send_file(os.path.join('files', filename), as_attachment=True)
-
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    from hypercorn.asyncio import serve
+    from hypercorn.config import Config
+    config = Config()
+    config.bind = ["localhost:5000"]
+    asyncio.run(serve(app, config))
