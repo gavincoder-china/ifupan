@@ -1,6 +1,8 @@
 from redis import asyncio as aioredis
 from redis.exceptions import AuthenticationError, TimeoutError, RedisError
 
+from ifupan.utils.log_util import logger
+from ifupan.config.env import RedisConfig
 
 
 class RedisUtil:
@@ -39,35 +41,17 @@ class RedisUtil:
             logger.error(f'redis连接错误，详细错误信息：{e}')
             raise
 
-    @classmethod
-    async def close_redis_pool(cls, app):
-        """
-        应用关闭时关闭redis连接
+    @staticmethod
+    async def close_redis_pool(redis):
+        await redis.close()
 
-        :param app: fastapi对象
-        :return:
-        """
-        await app.state.redis.close()
-        logger.info('关闭redis连接成功')
-
-    @classmethod
-    async def init_sys_dict(cls, redis):
-        """
-        应用启动时缓存字典表
-
-        :param redis: redis对象
-        :return:
-        """
-        async with AsyncSessionLocal() as session:
-            await DictDataService.init_cache_sys_dict_services(session, redis)
-
-    @classmethod
-    async def init_sys_config(cls, redis):
-        """
-        应用启动时缓存参数配置表
-
-        :param redis: redis对象
-        :return:
-        """
-        async with AsyncSessionLocal() as session:
-            await ConfigService.init_cache_sys_config_services(session, redis)
+    # @classmethod
+    # async def init_sys_config(cls, redis):
+    #     """
+    #     应用启动时缓存参数配置表
+    #
+    #     :param redis: redis对象
+    #     :return:
+    #     """
+    #     async with AsyncSessionLocal() as session:
+    #         await ConfigService.init_cache_sys_config_services(session, redis)

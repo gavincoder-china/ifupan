@@ -11,13 +11,14 @@ async def get_prompts():
     cached_prompts = await redis.get('prompts_list')
 
     if cached_prompts:
+        await RedisUtil.close_redis_pool(redis)
         return jsonify(eval(cached_prompts))
     
-    db = get_db()
-    prompts = await PromptService.get_all_prompts(db)
+    async for db in get_db():
+        prompts = await PromptService.get_all_prompts(db)
     
-    prompts_list = [{'code': p.code, 'name': p.name} for p in prompts]
-    await redis.set('prompts_list', str(prompts_list), ex=3600)  # Cache for 1 hour
+        prompts_list = [{'code': p.code, 'name': p.name} for p in prompts]
+        await redis.set('prompts_list', str(prompts_list), ex=3600)  # Cache for 1 hour
     
     await RedisUtil.close_redis_pool(redis)
     return jsonify(prompts_list)
