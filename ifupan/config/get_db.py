@@ -1,7 +1,8 @@
-from config.database import async_engine, AsyncSessionLocal, Base
+from contextlib import asynccontextmanager
+from config.database import AsyncSessionLocal, Base, async_engine
 from utils.log_util import logger
 
-
+@asynccontextmanager
 async def get_db():
     """
     每一个请求处理完毕后会关闭当前连接，不同的请求使用不同的连接

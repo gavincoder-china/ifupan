@@ -167,16 +167,17 @@
                             aria-controls="text" aria-selected="true">文字交互复盘
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
-                            id="mindmap-tab" data-bs-toggle="tab" data-bs-target="#mindmap" type="button" role="tab"
-                            aria-controls="mindmap" aria-selected="false">思维导图形式展示
-                    </button>
-                </li>
+
                 <li class="nav-item" role="presentation">
                     <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
                             id="speech-tab" data-bs-toggle="tab" data-bs-target="#speech" type="button" role="tab"
                             aria-controls="speech" aria-selected="false">语音交互复盘
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                            id="mindmap-tab" data-bs-toggle="tab" data-bs-target="#mindmap" type="button" role="tab"
+                            aria-controls="mindmap" aria-selected="false">思维导图形式展示
                     </button>
                 </li>
             </ul>
@@ -189,6 +190,12 @@
                 <select id="text-prompt-type" class="form-select mb-2">
                     <!-- Options will be dynamically populated -->
                 </select>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="generateExtras">
+                    <label class="form-check-label" for="generateExtras">
+                        同时生成思维导图、PDF和Markdown文件
+                    </label>
+                </div>
                 <textarea id="text-input"
                           class="form-control w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                           rows="4" placeholder="请输入您要复盘的内容..."></textarea>
@@ -197,6 +204,7 @@
                     分析
                 </button>
                 <div id="text-result" class="mt-3"></div>
+                <div id="extra-results" class="mt-3 hidden"></div>
             </div>
             <div class="tab-pane fade" id="mindmap" role="tabpanel" aria-labelledby="mindmap-tab">
                 <select id="mindmap-prompt-type" class="form-select mb-2">
@@ -216,6 +224,12 @@
                         class="form-select w-full dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                     <!-- Options will be dynamically populated -->
                 </select>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="generateExtrasSpeech">
+                    <label class="form-check-label" for="generateExtrasSpeech">
+                        同时生成思维导图、PDF和Markdown文件
+                    </label>
+                </div>
                 <div class="mb-3">
                     <button id="recordButton" onclick="toggleRecording()"
                             class="btn btn-success mb-2 w-full">开始录音
@@ -226,11 +240,12 @@
                         <button class="btn btn-outline-secondary" type="button" onclick="clearFileInput()">清除</button>
                     </div>
                 </div>
-                <button onclick="processAudio()"
+                <button onclick="analyzeSpeech()"
                         class="btn btn-primary w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 mb-3">
                     处理音频
                 </button>
                 <div id="speech-result" class="p-3 bg-white dark:bg-gray-700 rounded shadow-sm"></div>
+                <div id="extra-results-speech" class="mt-3 hidden"></div>
             </div>
         </div>
     </div>
@@ -241,16 +256,48 @@
     function analyzeText() {
         const text = document.getElementById('text-input').value;
         const promptType = document.getElementById('text-prompt-type').value;
-        axios.post('/api/text-analysis/analyze', {text: text, promptType: promptType}, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-                .then(response => {
-                    const resultDiv = document.getElementById('text-result');
-                    resultDiv.innerHTML = marked.parse(response.data.result);
-                    resultDiv.classList.add('fade-in');
-                });
+        const generateExtras = document.getElementById('generateExtras').checked;
+
+        axios.post('/api/text-analysis/analyze', { text: text, promptType: promptType, generateExtras: generateExtras })
+            .then(response => {
+                const resultDiv = document.getElementById('text-result');
+                resultDiv.innerHTML = marked.parse(response.data.result);
+                resultDiv.classList.add('fade-in');
+
+                const extraResultsDiv = document.getElementById('extra-results');
+                if (generateExtras && response.data.extras) {
+                    extraResultsDiv.innerHTML = '';
+                    extraResultsDiv.classList.remove('hidden');
+
+                    const mindMapLink = document.createElement('a');
+                    mindMapLink.href = `/api/mind-map/${response.data.extras.mind_map}`;
+                    mindMapLink.textContent = '下载思维导图';
+                    mindMapLink.download = response.data.extras.mind_map;
+                    mindMapLink.className = 'btn btn-primary m-1';
+
+                    const pdfLink = document.createElement('a');
+                    pdfLink.href = `/api/mind-map/${response.data.extras.pdf}`;
+                    pdfLink.textContent = '下载PDF报告';
+                    pdfLink.download = response.data.extras.pdf;
+                    pdfLink.className = 'btn btn-secondary m-1';
+
+                    const mdLink = document.createElement('a');
+                    mdLink.href = `/api/mind-map/${response.data.extras.markdown}`;
+                    mdLink.textContent = '下载Markdown文件';
+                    mdLink.download = response.data.extras.markdown;
+                    mdLink.className = 'btn btn-info m-1';
+
+                    extraResultsDiv.appendChild(mindMapLink);
+                    extraResultsDiv.appendChild(pdfLink);
+                    extraResultsDiv.appendChild(mdLink);
+                } else {
+                    extraResultsDiv.classList.add('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('分析文本时出错');
+            });
     }
 
     function generateMindMap() {
@@ -322,9 +369,10 @@
         }
     }
 
-    function processAudio() {
+    function analyzeSpeech() {
         const audioFile = document.getElementById('audioFileInput').files[0];
         const promptType = document.getElementById('speech-prompt-type').value;
+        const generateExtras = document.getElementById('generateExtrasSpeech').checked;
         const formData = new FormData();
 
         if (audioFile) {
@@ -338,17 +386,48 @@
         }
 
         formData.append("promptType", promptType);
+        formData.append("generateExtras", generateExtras);
 
         axios.post('/api/speech-to-text/transcribe', formData)
-                .then(response => {
-                    const resultDiv = document.getElementById('speech-result');
-                    resultDiv.innerHTML = marked.parse(response.data.result);
-                    resultDiv.classList.add('fade-in');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('处理音频时出错');
-                });
+            .then(response => {
+                const resultDiv = document.getElementById('speech-result');
+                resultDiv.innerHTML = marked.parse(response.data.result);
+                resultDiv.classList.add('fade-in');
+
+                const extraResultsDiv = document.getElementById('extra-results-speech');
+                if (generateExtras && response.data.extras) {
+                    extraResultsDiv.innerHTML = '';
+                    extraResultsDiv.classList.remove('hidden');
+
+                    const mindMapLink = document.createElement('a');
+                    mindMapLink.href = `/api/mind-map/${response.data.extras.mind_map}`;
+                    mindMapLink.textContent = '下载思维导图';
+                    mindMapLink.download = response.data.extras.mind_map;
+                    mindMapLink.className = 'btn btn-primary m-1';
+
+                    const pdfLink = document.createElement('a');
+                    pdfLink.href = `/api/mind-map/${response.data.extras.pdf}`;
+                    pdfLink.textContent = '下载PDF报告';
+                    pdfLink.download = response.data.extras.pdf;
+                    pdfLink.className = 'btn btn-secondary m-1';
+
+                    const mdLink = document.createElement('a');
+                    mdLink.href = `/api/mind-map/${response.data.extras.markdown}`;
+                    mdLink.textContent = '下载Markdown文件';
+                    mdLink.download = response.data.extras.markdown;
+                    mdLink.className = 'btn btn-info m-1';
+
+                    extraResultsDiv.appendChild(mindMapLink);
+                    extraResultsDiv.appendChild(pdfLink);
+                    extraResultsDiv.appendChild(mdLink);
+                } else {
+                    extraResultsDiv.classList.add('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('处理音频时出错');
+            });
 
         // Reset recording state
         audioChunks = [];

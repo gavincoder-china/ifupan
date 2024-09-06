@@ -32,11 +32,12 @@ class MindMapService:
         return await MindMapDAO.get_all(db, skip, limit)
     
     @staticmethod
-    async def generate(db, text, prompt_type):
+    async def generate(text):
         mind_map_file = None
         pdf_file = None
         md_file = None
-        review_content = await TextAnalysisService.analyze(db, text, prompt_type)
+        # review_content = await TextAnalysisService.analyze(db, text, prompt_type)
+        review_content = text
         try:
             mind_map_file = MindMapService.generate_mind_map(review_content)
             mind_map_file = os.path.basename(mind_map_file)

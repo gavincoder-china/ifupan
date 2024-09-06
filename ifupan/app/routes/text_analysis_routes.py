@@ -1,22 +1,34 @@
 from flask import Blueprint, request, jsonify
 from app.services.text_analysis_service import TextAnalysisService
+from app.services.mind_map_service import MindMapService
 from config.get_db import get_db
 
 text_analysis_bp = Blueprint('text_analysis', __name__)
 
 @text_analysis_bp.route('/analyze', methods=['POST'])
 async def analyze():
-    db = await anext(get_db())
-    try:
-        data = request.json
-        text = data.get('text', '')
-        prompt_type = data.get('promptType', 'diary')
-        
-        result = await TextAnalysisService.analyze_and_save(db, text, prompt_type)
-        
-        return jsonify({'result': result.result})
-    finally:
-        await db.close()
+    async with get_db() as db:
+        try:
+            data = request.json
+            text = data.get('text', '')
+            prompt_type = data.get('promptType', 'diary')
+            generate_extras = data.get('generateExtras', False)
+            
+            result = await TextAnalysisService.analyze_and_save(db, text, prompt_type)
+            
+            response_data = {'result': result.result}
+            
+            if generate_extras:
+                mind_map_file, pdf_file, md_file = await MindMapService.generate(result.result)
+                response_data['extras'] = {
+                    'mind_map': mind_map_file,
+                    'pdf': pdf_file,
+                    'markdown': md_file
+                }
+            
+            return jsonify(response_data)
+        finally:
+            await db.close()
 
 @text_analysis_bp.route('/<int:analysis_id>', methods=['GET'])
 async def get_analysis_by_id(analysis_id):
