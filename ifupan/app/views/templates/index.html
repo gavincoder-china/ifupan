@@ -180,6 +180,12 @@
                             aria-controls="mindmap" aria-selected="false">思维导图形式展示
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-4 py-2 rounded-md text-white hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                            id="prompt-management-tab" type="button" onclick="window.location.href='/api/prompt/prompt-crud'">
+                        模型管理
+                    </button>
+                </li>
             </ul>
         </div>
     </div>
@@ -499,7 +505,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function () {
-        fetch('/api/common/prompts')
+        fetch('/api/prompt/prompts')
                 .then(response => response.json())
                 .then(data => {
                     const selectElements = ['text-prompt-type', 'mindmap-prompt-type', 'speech-prompt-type'];
