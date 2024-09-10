@@ -6,19 +6,23 @@ from config.get_redis import RedisUtil
 common_bp = Blueprint('common', __name__)
 
 @common_bp.route('/prompts', methods=['GET'])
-async def get_prompts():
-    redis = await RedisUtil.create_redis_pool()
-    cached_prompts = await redis.get('prompts_list')
+def get_prompts():
+    redis = RedisUtil.create_redis_pool_sync()
+    cached_prompts = redis.get('prompts_list')
 
     if cached_prompts:
-        await RedisUtil.close_redis_pool(redis)
-        return jsonify(eval(cached_prompts))
-    
-    async with get_db() as db:
-        prompts = await PromptService.get_all_prompts(db)
+        RedisUtil.close_redis_pool_sync(redis)
+        try:
+            return jsonify(eval(cached_prompts.decode('utf-8') if isinstance(cached_prompts, bytes) else cached_prompts))
+        except:
+            # If there's an error decoding or evaluating the cached data, we'll fetch fresh data
+            pass
+
+    with get_db() as db:
+        prompts = PromptService.get_all_prompts(db)
     
         prompts_list = [{'code': p.code, 'name': p.name} for p in prompts]
-        await redis.set('prompts_list', str(prompts_list), ex=3600)  # Cache for 1 hour
+        redis.set('prompts_list', str(prompts_list), ex=3600)  # Cache for 1 hour
     
-    await RedisUtil.close_redis_pool(redis)
+    RedisUtil.close_redis_pool_sync(redis)
     return jsonify(prompts_list)

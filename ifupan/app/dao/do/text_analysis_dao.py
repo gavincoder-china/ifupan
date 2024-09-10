@@ -1,22 +1,19 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy.orm import Session
 from app.entity.text_analysis_model import TextAnalysis
 
 class TextAnalysisDAO:
     @staticmethod
-    async def create(db: AsyncSession, input_text: str, prompt_type: str, result: str):
+    def create(db: Session, input_text: str, prompt_type: str, result: str):
         db_item = TextAnalysis(input_text=input_text, prompt_type=prompt_type, result=result)
         db.add(db_item)
-        await db.commit()
-        await db.refresh(db_item)
+        db.commit()
+        db.refresh(db_item)
         return db_item
 
     @staticmethod
-    async def get_by_id(db: AsyncSession, item_id: int):
-        result = await db.execute(select(TextAnalysis).filter(TextAnalysis.id == item_id))
-        return result.scalar_one_or_none()
+    def get_by_id(db: Session, item_id: int):
+        return db.query(TextAnalysis).filter(TextAnalysis.id == item_id).first()
 
     @staticmethod
-    async def get_all(db: AsyncSession, skip: int = 0, limit: int = 100):
-        result = await db.execute(select(TextAnalysis).offset(skip).limit(limit))
-        return result.scalars().all()
+    def get_all(db: Session, skip: int = 0, limit: int = 100):
+        return db.query(TextAnalysis).offset(skip).limit(limit).all()

@@ -390,43 +390,57 @@
 
         axios.post('/api/speech-to-text/transcribe', formData)
             .then(response => {
+                console.log('Response data:', response.data);  // Log the entire response data
                 const resultDiv = document.getElementById('speech-result');
-                resultDiv.innerHTML = marked.parse(response.data.result);
-                resultDiv.classList.add('fade-in');
+                if (response.data.analysis) {
+                    resultDiv.innerHTML = marked.parse(response.data.analysis);
+                    resultDiv.classList.add('fade-in');
+                } else {
+                    resultDiv.innerHTML = '<p>No analysis result available.</p>';
+                }
 
                 const extraResultsDiv = document.getElementById('extra-results-speech');
                 if (generateExtras && response.data.extras) {
                     extraResultsDiv.innerHTML = '';
                     extraResultsDiv.classList.remove('hidden');
 
-                    const mindMapLink = document.createElement('a');
-                    mindMapLink.href = `/api/mind-map/${response.data.extras.mind_map}`;
-                    mindMapLink.textContent = '下载思维导图';
-                    mindMapLink.download = response.data.extras.mind_map;
-                    mindMapLink.className = 'btn btn-primary m-1';
+                    if (response.data.extras.mind_map) {
+                        const mindMapLink = document.createElement('a');
+                        mindMapLink.href = `/api/mind-map/${response.data.extras.mind_map}`;
+                        mindMapLink.textContent = '下载思维导图';
+                        mindMapLink.download = response.data.extras.mind_map;
+                        mindMapLink.className = 'btn btn-primary m-1';
+                        extraResultsDiv.appendChild(mindMapLink);
+                    }
 
-                    const pdfLink = document.createElement('a');
-                    pdfLink.href = `/api/mind-map/${response.data.extras.pdf}`;
-                    pdfLink.textContent = '下载PDF报告';
-                    pdfLink.download = response.data.extras.pdf;
-                    pdfLink.className = 'btn btn-secondary m-1';
+                    if (response.data.extras.pdf) {
+                        const pdfLink = document.createElement('a');
+                        pdfLink.href = `/api/mind-map/${response.data.extras.pdf}`;
+                        pdfLink.textContent = '下载PDF报告';
+                        pdfLink.download = response.data.extras.pdf;
+                        pdfLink.className = 'btn btn-secondary m-1';
+                        extraResultsDiv.appendChild(pdfLink);
+                    }
 
-                    const mdLink = document.createElement('a');
-                    mdLink.href = `/api/mind-map/${response.data.extras.markdown}`;
-                    mdLink.textContent = '下载Markdown文件';
-                    mdLink.download = response.data.extras.markdown;
-                    mdLink.className = 'btn btn-info m-1';
-
-                    extraResultsDiv.appendChild(mindMapLink);
-                    extraResultsDiv.appendChild(pdfLink);
-                    extraResultsDiv.appendChild(mdLink);
+                    if (response.data.extras.markdown) {
+                        const mdLink = document.createElement('a');
+                        mdLink.href = `/api/mind-map/${response.data.extras.markdown}`;
+                        mdLink.textContent = '下载Markdown文件';
+                        mdLink.download = response.data.extras.markdown;
+                        mdLink.className = 'btn btn-info m-1';
+                        extraResultsDiv.appendChild(mdLink);
+                    }
                 } else {
                     extraResultsDiv.classList.add('hidden');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('处理音频时出错');
+                if (error.response) {
+                    console.error('Response data:', error.response.data);
+                    console.error('Response status:', error.response.status);
+                }
+                alert('处理音频时出错: ' + error.message);
             });
 
         // Reset recording state

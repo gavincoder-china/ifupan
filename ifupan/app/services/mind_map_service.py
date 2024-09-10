@@ -19,24 +19,23 @@ if not os.path.exists('files'):
 
 class MindMapService:
     @staticmethod
-    async def generate_and_save(db: Session, input_text: str, prompt_type: str):
-        mind_map_file, pdf_file, md_file = await MindMapService.generate(db, input_text, prompt_type)
-        return await MindMapDAO.create(db, input_text, prompt_type, mind_map_file, pdf_file, md_file)
+    def generate_and_save(db: Session, input_text: str, prompt_type: str):
+        mind_map_file, pdf_file, md_file = MindMapService.generate(input_text)
+        return MindMapDAO.create(db, input_text, prompt_type, mind_map_file, pdf_file, md_file)
 
     @staticmethod
-    async def get_mind_map_by_id(db: Session, mind_map_id: int):
-        return await MindMapDAO.get_by_id(db, mind_map_id)
+    def get_mind_map_by_id(db: Session, mind_map_id: int):
+        return MindMapDAO.get_by_id(db, mind_map_id)
 
     @staticmethod
-    async def get_all_mind_maps(db: Session, skip: int = 0, limit: int = 100):
-        return await MindMapDAO.get_all(db, skip, limit)
+    def get_all_mind_maps(db: Session, skip: int = 0, limit: int = 100):
+        return MindMapDAO.get_all(db, skip, limit)
     
     @staticmethod
-    async def generate(text):
+    def generate(text):
         mind_map_file = None
         pdf_file = None
         md_file = None
-        # review_content = await TextAnalysisService.analyze(db, text, prompt_type)
         review_content = text
         try:
             mind_map_file = MindMapService.generate_mind_map(review_content)
@@ -47,7 +46,7 @@ class MindMapService:
             mind_map_file = "error_mind_map.png"  # Set a default value
 
         try:
-            pdf_file, md_file = await MindMapService.generate_pdf_report(review_content)
+            pdf_file, md_file = MindMapService.generate_pdf_report(review_content)
             pdf_file = os.path.basename(pdf_file)
             md_file = os.path.basename(md_file)
             logging.info(f"复盘报告已生成：{pdf_file}, Markdown文件：{md_file}")
@@ -115,8 +114,7 @@ class MindMapService:
         return mind_map_filename + '.png'
 
     @staticmethod
-    async def generate_pdf_report(review_content):
-
+    def generate_pdf_report(review_content):
         unique_filename = f'review_report_{int(time.time())}'
         md_filename = os.path.join('files', f'{unique_filename}.md')
         with open(md_filename, 'w', encoding='utf-8') as f:
