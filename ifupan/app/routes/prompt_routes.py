@@ -1,7 +1,6 @@
-from flask import Blueprint, jsonify, request, render_template
 from app.services.prompts_service import PromptService
 from config.get_db import get_db
-from config.get_redis import RedisUtil
+from flask import Blueprint, jsonify, request, render_template
 
 prompt_bp = Blueprint('prompt', __name__)
 
